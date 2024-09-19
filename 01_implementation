@@ -1,0 +1,150 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, roc_curve, auc, precision_recall_curve
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+from keras.utils import to_categorical
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset
+df = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/combined_dataset.csv')
+print(df.head())
+
+# Separate features and labels
+X = df.drop(['label', 'domain'], axis=1)  # Exclude 'label' and 'domain' columns
+Y = df['label']
+
+# Split the data into training and testing sets
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
+
+# Standardize the features
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Define parameter grid for Random Forest
+rf_param_grid = {
+    'n_estimators': [100, 200],
+    'max_depth': [None, 10, 20],
+    'min_samples_split': [2, 5],
+    'min_samples_leaf': [1, 2]
+}
+
+# Grid Search for Random Forest
+rf_grid_search = GridSearchCV(RandomForestClassifier(random_state=42), rf_param_grid, cv=3, scoring='accuracy', n_jobs=-1)
+rf_grid_search.fit(X_train, Y_train)
+best_rf_model = rf_grid_search.best_estimator_
+
+# Define parameter grid for Gradient Boosting
+gb_param_grid = {
+    'n_estimators': [100, 200],
+    'learning_rate': [0.01, 0.1],
+    'max_depth': [3, 5, 7]
+}
+
+# Grid Search for Gradient Boosting
+gb_grid_search = GridSearchCV(GradientBoostingClassifier(random_state=42), gb_param_grid, cv=3, scoring='accuracy', n_jobs=-1)
+gb_grid_search.fit(X_train, Y_train)
+best_gb_model = gb_grid_search.best_estimator_
+
+# Convert labels to categorical one-hot encoding
+Y_train_categorical = to_categorical(Y_train, num_classes=2)
+Y_test_categorical = to_categorical(Y_test, num_classes=2)
+
+# Initialize and train the Sequential Neural Network
+nn_model = Sequential()
+nn_model.add(Dense(128, input_dim=X_train.shape[1], activation='relu'))
+nn_model.add(Dropout(0.5))
+nn_model.add(Dense(64, activation='relu'))
+nn_model.add(Dropout(0.5))
+nn_model.add(Dense(2, activation='softmax'))
+
+nn_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+nn_model.fit(X_train, Y_train_categorical, epochs=20, batch_size=32, validation_data=(X_test, Y_test_categorical))
+
+# Cross-validation for Random Forest
+rf_cv_scores = cross_val_score(best_rf_model, X, Y, cv=3)
+print("Random Forest Cross-Validation Scores:", rf_cv_scores)
+print("Random Forest Cross-Validation Mean Score:", np.mean(rf_cv_scores))
+
+# Cross-validation for Gradient Boosting
+gb_cv_scores = cross_val_score(best_gb_model, X, Y, cv=3)
+print("Gradient Boosting Cross-Validation Scores:", gb_cv_scores)
+print("Gradient Boosting Cross-Validation Mean Score:", np.mean(gb_cv_scores))
+
+# Feature importance from Random Forest
+rf_feature_importances = best_rf_model.feature_importances_
+rf_feature_importance_df = pd.DataFrame({
+    'Feature': X.columns,
+    'Importance': rf_feature_importances
+}).sort_values(by='Importance', ascending=False)
+
+# Plot feature importances for Random Forest
+plt.figure(figsize=(12, 6))
+sns.barplot(x='Importance', y='Feature', data=rf_feature_importance_df)
+plt.title('Random Forest Feature Importances')
+plt.show()
+
+# Feature importance from Gradient Boosting
+gb_feature_importances = best_gb_model.feature_importances_
+gb_feature_importance_df = pd.DataFrame({
+    'Feature': X.columns,
+    'Importance': gb_feature_importances
+}).sort_values(by='Importance', ascending=False)
+
+# Plot feature importances for Gradient Boosting
+plt.figure(figsize=(12, 6))
+sns.barplot(x='Importance', y='Feature', data=gb_feature_importance_df)
+plt.title('Gradient Boosting Feature Importances')
+plt.show()
+
+# Obtain probabilities from each model
+rf_probabilities = best_rf_model.predict_proba(X_test)[:, 1]
+gb_probabilities = best_gb_model.predict_proba(X_test)[:, 1]
+nn_probabilities = nn_model.predict(X_test)[:, 1]
+
+# Combine the probabilities (simple averaging)
+combined_probabilities = (rf_probabilities + gb_probabilities + nn_probabilities) / 3
+
+# Convert combined probabilities to binary predictions
+combined_predictions = [1 if prob > 0.5 else 0 for prob in combined_probabilities]
+
+# Evaluate the combined model
+print("Confusion Matrix:")
+print(confusion_matrix(Y_test, combined_predictions))
+print("\nClassification Report:")
+print(classification_report(Y_test, combined_predictions))
+print("\nAccuracy Score:")
+print(accuracy_score(Y_test, combined_predictions))
+
+# Plot ROC Curve
+fpr, tpr, _ = roc_curve(Y_test, combined_probabilities)
+roc_auc = auc(fpr, tpr)
+
+plt.figure(figsize=(10, 6))
+plt.plot(fpr, tpr, color='blue', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='grey', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend(loc="lower right")
+plt.show()
+
+# Plot Precision-Recall Curve
+precision, recall, _ = precision_recall_curve(Y_test, combined_probabilities)
+
+plt.figure(figsize=(10, 6))
+plt.plot(recall, precision, color='blue', lw=2)
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.title('Precision-Recall Curve')
+plt.show()
+
+
+#we get the output
