@@ -49,9 +49,9 @@ Other columns are treated as features for classification (e.g., length, entropy,
 
 These visualizations help understand:
 
--Which features are most important in detecting phishing URLs.
--How each model performs individually.
--The effectiveness of the ensemble approach
+- Which features are most important in detecting phishing URLs.
+- How each model performs individually.
+- The effectiveness of the ensemble approach
 
 # Models Used
 1. Random Forest Classifier
