@@ -48,7 +48,7 @@ Other columns are treated as features for classification (e.g., length, entropy,
 
 These visualizations help understand:
 
- -Which features are most important in detecting phishing URLs.
+-Which features are most important in detecting phishing URLs.
 -How each model performs individually.
 -The effectiveness of the ensemble approach
 
@@ -57,10 +57,10 @@ These visualizations help understand:
    - Ensemble method using multiple decision trees.
    - Hyperparameter tuning via GridSearchCV.
 2. Gradient Boosting Classifier
-  - Sequentially corrects errors using boosting.
-  - Also tuned using GridSearchCV.
+   - Sequentially corrects errors using boosting.
+   - Also tuned using GridSearchCV.
 3. Sequential Neural Network (TensorFlow/Keras)
-  - Feedforward architecture with Dense and Dropout layers.
-  - Optimized using Adam and trained with categorical crossentropy loss.
+   - Feedforward architecture with Dense and Dropout layers.
+   - Optimized using Adam and trained with categorical crossentropy loss.
 4. Ensemble Model
-  - Averages predicted probabilities from all three models to improve generalization.
+   - Averages predicted probabilities from all three models to improve generalization.
