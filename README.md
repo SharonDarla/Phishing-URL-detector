@@ -6,12 +6,12 @@ Phishing URL Detection Using Machine Learning: This project implements and compa
 
 The project performs the following steps:
 
-Loads and preprocesses URL/domain data.
-Trains multiple classifiers with hyperparameter tuning.
-Evaluates individual models using cross-validation and feature importance analysis.
-Builds a neural network classifier.
-Combines predictions from all models into an ensemble method.
-Visualizes performance metrics (confusion matrix, ROC curve, Precision-Recall curve).
+- Loads and preprocesses URL/domain data.
+- Trains multiple classifiers with hyperparameter tuning.
+- Evaluates individual models using cross-validation and feature importance analysis.
+- Builds a neural network classifier.
+- Combines predictions from all models into an ensemble method.
+- Visualizes performance metrics (confusion matrix, ROC curve, Precision-Recall curve).
 
 # Requirements
 
@@ -29,6 +29,7 @@ Other columns are treated as features for classification (e.g., length, entropy,
 # Project Structure
 
 | Stages | Description |
+|:--------:|:---------:|
 | Data Loading | Reads the CSV file and displays the first few rows. |
 |Preprocessing | Drops irrelevant columns, scales features, and splits into train/test sets.|
 | Model Training | Trains Random Forest, Gradient Boosting, and Neural Network models with hyperparameter tuning. |
