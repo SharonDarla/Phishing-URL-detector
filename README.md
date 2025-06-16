@@ -41,11 +41,11 @@ Other columns are treated as features for classification (e.g., length, entropy,
 
 # Results & Analysis
 
--Cross-validation scores for Random Forest and Gradient Boosting.
--Feature importance plots.
--Neural Network training progress.
--Confusion Matrix and Classification Report for the ensemble model.
--ROC Curve and Precision-Recall Curve for model evaluation.
+- Cross-validation scores for Random Forest and Gradient Boosting.
+- Features important plots.
+- Neural Network training progress.
+- Confusion Matrix and Classification Report for the ensemble model.
+- ROC Curve and Precision-Recall Curve for model evaluation.
 
 These visualizations help understand:
 
