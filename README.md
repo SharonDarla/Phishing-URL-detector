@@ -20,7 +20,7 @@ pip install pandas numpy scikit-learn matplotlib seaborn tensorflow
 pip install plotly
 
 # Dataset
-The dataset was named as combined_dataset.csv.
+The dataset is named as combined_dataset.csv.
 It contains:
 A column named 'label' indicating whether a domain is phishing (1) or benign (0).
 A column named 'domain' which will be excluded during training.
